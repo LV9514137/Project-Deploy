@@ -7,7 +7,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { backendUrl, setToken, navigate } = useContext(AdminContext);
+  const { backendUrl, setToken, navigate,loading } = useContext(AdminContext);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -38,6 +38,12 @@ const Login = () => {
     }
   };
 
+  
+      if (loading) {
+  
+          return <Loader />
+      }
+ 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
