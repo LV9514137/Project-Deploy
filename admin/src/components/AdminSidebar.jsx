@@ -7,6 +7,8 @@ import {
   Users,
   TriangleAlert,
   FileText,
+  Gauge,
+  Layers
 } from "lucide-react";
 
 const AdminSidebar = () => {
@@ -87,9 +89,37 @@ const AdminSidebar = () => {
             }`
           }
         >
-          <FileText size={20} />
-          Reports
+           
         </NavLink>
+
+       <NavLink
+  to="/admin/press-capacity"
+  className={({ isActive }) =>
+    `flex items-center gap-3 ${
+      isActive
+        ? "text-blue-400 font-semibold"
+        : "hover:text-blue-400"
+    }`
+  }
+>
+  <Gauge size={20} />
+  Press Capacity
+</NavLink>
+
+
+<NavLink
+  to="/admin/part-wise-tonnage"
+  className={({ isActive }) =>
+    `flex items-center gap-3 ${
+      isActive
+        ? "text-blue-400 font-semibold"
+        : "hover:text-blue-400"
+    }`
+  }
+>
+  <Layers size={20} />
+  Part Wise Tonnage
+</NavLink>
 
       </div>
     </div>

@@ -17,6 +17,9 @@ import supplierRouter from "./src/routes/supplier.routes.js"
 import partdetailsRouter from "./src/routes/part.details.routes.js"
 import dashboardRouter from "./src/routes/dashboard.routes.js";
 import adminRouter from "./src/routes/admin.routes.js"
+import pressConfigurationRouter from "./src/routes/press.configuration.routes.js"
+import importRouter from "./src/routes/import.routes.js";
+import partTonnageRoutes from "./src/routes/partTonnage.routes.js"
 
 
 
@@ -26,6 +29,10 @@ app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/part", partdetailsRouter);
 app.use( "/api/v1/dashboard", dashboardRouter)
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/admin/press-configuration", pressConfigurationRouter);
+app.use("/api/v1/admin/import", importRouter);
+app.use("/api/v1/admin", partTonnageRoutes);
+
 
 app.use((err, req, res, next) => {
     return res.status(err.statusCode || 500).json({

@@ -11,6 +11,8 @@ import EditPart from "./pages/EditPart";
 import { ViewPage } from "./pages/ViewPage";
 import Home from "./pages/Home";
 import OverdueParts from "./pages/OverdueParts";
+import CapacityDashboard from "./pages/CapacityDashboard";
+import PartWiseTonnageDashboard from "./pages/PartWiseTonnageDashboard";
 
 function App() {
   const location = useLocation();
@@ -29,9 +31,8 @@ function App() {
 
         {/* Right Main Content Area */}
         <main
-          className={`flex-1 min-w-0 ${
-            !isAuthPage ? "ml-64" : ""
-          }`}
+          className={`flex-1 min-w-0 ${!isAuthPage ? "ml-64" : ""
+            }`}
         >
           {/* overflow-x-auto लगाने से टेबल राइट टू लेफ्ट यहीं स्क्रॉल होगी, साइडबार के ऊपर नहीं जाएगी */}
           <div className="p-5 overflow-x-auto w-full">
@@ -44,6 +45,8 @@ function App() {
               <Route path="/admin/view-part/:id" element={<ViewPage />} />
               <Route path="/" element={<Home />} />
               <Route path="/admin/overdue-parts" element={<OverdueParts />} />
+              <Route path="/admin/press-capacity" element={<CapacityDashboard />} />
+              <Route path="/admin/part-wise-tonnage" element={<PartWiseTonnageDashboard />} />
             </Routes>
           </div>
         </main>

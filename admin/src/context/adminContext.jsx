@@ -9,6 +9,8 @@ const AdminContextProvider = ({ children }) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true)
+    const [capacityData, setCapacityData] = useState([]);
+    const [partTonnageData, setPartTonnageData] = useState(null);
 
     const [token, setToken] = useState(
         () => localStorage.getItem("adminToken") || ""
@@ -139,6 +141,42 @@ const AdminContextProvider = ({ children }) => {
         console.log("AllSu", allSupplierData);
     }, [allSupplierData]);
 
+    const getCapacityData = async () => {
+        try {
+            const response = await axios.get(
+                `${backendUrl}/api/v1/admin/press-configuration/capacity-utilization`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setCapacityData(response.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    
+
+    const getPartTonnageData = async () => {
+        try {
+            const response = await axios.get(
+                `${backendUrl}/api/v1/admin/part-tonnage-dashboard`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            setPartTonnageData(response.data.data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
 
 
     return (
@@ -160,7 +198,11 @@ const AdminContextProvider = ({ children }) => {
                 allSupplierData,
                 overdueParts,
                 delayParts,
-                setDelayedParts
+                setDelayedParts,
+                capacityData,
+                getCapacityData,
+                partTonnageData,
+                getPartTonnageData
             }}
         >
             {children}
