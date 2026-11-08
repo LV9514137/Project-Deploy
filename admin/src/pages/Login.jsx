@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { AdminContext } from "../context/adminContext";
 import toast from "react-hot-toast";
-import Loader from "../components/Loader";
+import { LoaderCircle } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,31 +27,40 @@ const Login = () => {
 
       const response = await axios.post(
         `${backendUrl}/api/v1/admin/login`,
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
-      toast.success(response.data.message);
-
-      localStorage.setItem(
-        "adminToken",
-        response.data.data
-      );
+      localStorage.setItem("adminToken", response.data.data);
 
       setToken(response.data.data);
 
+      toast.success(response.data.message);
+
       navigate("/admin/dashboard");
 
+      // Loading will be stopped after dashboard data is loaded.
     } catch (error) {
+      setLoading(false);
+
       toast.error(
         error.response?.data?.message || "Something went wrong"
       );
-    } finally {
-      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 gap-4">
+        <LoaderCircle
+          size={48}
+          className="animate-spin text-blue-600"
+        />
+        <p className="text-gray-700 font-medium">
+          Loading Dashboard...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -98,9 +107,9 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
           >
-            {loading ? "Logging in..." : "Login"}
+            Login
           </button>
 
         </form>
