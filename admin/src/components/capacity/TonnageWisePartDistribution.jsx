@@ -135,7 +135,7 @@ const TonnageWisePartDistribution = ({ parts = [] }) => {
                             dataKey="count"
                             name="Total Parts"
                             fill="url(#partTonnageGradient)"
-                            radius={[6, 6, 0, 0]}
+                            radius={[0, 0, 0, 0]}
                             maxBarSize={38}
                             animationDuration={800}
                         >

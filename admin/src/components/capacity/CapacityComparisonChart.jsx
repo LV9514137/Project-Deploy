@@ -8,14 +8,13 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend,
     ResponsiveContainer,
     LabelList
 } from "recharts";
 
 import { Layers } from "lucide-react";
 
-const CapacityComparisonChart = ({ capacityData }) => {
+const CapacityComparisonChart = ({ capacityData = [] }) => {
 
     const tonnageOrder = [
         "63T", "110T", "160T", "200T", "250T",
@@ -43,16 +42,25 @@ const CapacityComparisonChart = ({ capacityData }) => {
             available,
             required
         };
+
     }).filter(item => item.available > 0 || item.required > 0);
+
+    // K format
+    const formatBarLabel = (value) => {
+        const number = Number(value);
+
+        if (number >= 1000) {
+            return `${(number / 1000).toFixed(
+                number % 1000 === 0 ? 0 : 1
+            )}K`;
+        }
+
+        return number.toString();
+    };
 
     // Exact number format for tooltip
     const formatNumber = (value) =>
         Number(value).toLocaleString("en-IN");
-
-    // K and L format for bar labels and Y-axis
-    const formatBarLabel = (value) => {
-    return Number(value).toLocaleString("en-IN");
-};
 
     return (
         <div className="bg-white p-5 h-full flex flex-col rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
@@ -64,8 +72,6 @@ const CapacityComparisonChart = ({ capacityData }) => {
                     <h2 className="text-lg font-bold text-gray-800">
                         Available vs Required Strokes
                     </h2>
-
-                    
                 </div>
 
                 <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -90,12 +96,15 @@ const CapacityComparisonChart = ({ capacityData }) => {
                         barGap={5}
                     >
 
+                        {/* Gradients */}
                         <defs>
 
                             <linearGradient
                                 id="availableGradient"
-                                x1="0" y1="0"
-                                x2="0" y2="1"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
                             >
                                 <stop offset="0%" stopColor="#3B82F6" />
                                 <stop offset="100%" stopColor="#1D4ED8" />
@@ -103,8 +112,10 @@ const CapacityComparisonChart = ({ capacityData }) => {
 
                             <linearGradient
                                 id="requiredGradient"
-                                x1="0" y1="0"
-                                x2="0" y2="1"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
                             >
                                 <stop offset="0%" stopColor="#FB923C" />
                                 <stop offset="100%" stopColor="#EA580C" />
@@ -156,42 +167,14 @@ const CapacityComparisonChart = ({ capacityData }) => {
                             }}
                         />
 
-                        <Legend
-                            verticalAlign="bottom"
-                            iconType="circle"
-                            wrapperStyle={{
-                                paddingTop: "15px",
-                                fontSize: "12px"
-                            }}
-                        />
-
-                        {/* Available Strokes */}
-                        <Bar
-                            dataKey="available"
-                            name="Available Strokes"
-                            fill="url(#availableGradient)"
-                            radius={[5, 5, 0, 0]}
-                            maxBarSize={30}
-                        >
-                            <LabelList
-                                dataKey="available"
-                                position="top"
-                                formatter={formatBarLabel}
-                                style={{
-                                    fill: "#2563EB",
-                                    fontSize: 10,
-                                    fontWeight: 600
-                                }}
-                            />
-                        </Bar>
-
-                        {/* Required Strokes */}
+                        {/* Required Strokes - Second visual position */}
                         <Bar
                             dataKey="required"
                             name="Required Strokes"
                             fill="url(#requiredGradient)"
-                            radius={[5, 5, 0, 0]}
+                            radius={[0, 0, 0, 0]}
                             maxBarSize={30}
+                            isAnimationActive={false}
                         >
                             <LabelList
                                 dataKey="required"
@@ -205,9 +188,49 @@ const CapacityComparisonChart = ({ capacityData }) => {
                             />
                         </Bar>
 
+                        {/* Available Strokes - First visual position */}
+                        <Bar
+                            dataKey="available"
+                            name="Available Strokes"
+                            fill="url(#availableGradient)"
+                            radius={[0, 0, 0, 0]}
+                            maxBarSize={30}
+                            isAnimationActive={false}
+                        >
+                            <LabelList
+                                dataKey="available"
+                                position="top"
+                                formatter={formatBarLabel}
+                                style={{
+                                    fill: "#2563EB",
+                                    fontSize: 10,
+                                    fontWeight: 600
+                                }}
+                            />
+                        </Bar>
+
                     </BarChart>
 
                 </ResponsiveContainer>
+
+            </div>
+
+            {/* Custom Legend */}
+            <div className="flex items-center justify-center gap-5 mt-2">
+
+                <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-blue-500"></span>
+                    <span className="text-xs text-gray-800">
+                        Available Strokes
+                    </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-orange-500"></span>
+                    <span className="text-xs text-gray-800">
+                        Required Strokes
+                    </span>
+                </div>
 
             </div>
 

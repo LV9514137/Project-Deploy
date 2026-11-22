@@ -164,9 +164,7 @@ const CapacityDashboard = () => {
                         Press Capacity Dashboard
                     </h1>
 
-                    <p className="text-gray-500 mt-2">
-                        Supplier-wise and tonnage-wise capacity overview.
-                    </p>
+                  
                 </div>
 
                 {/* Hidden CSV Input */}

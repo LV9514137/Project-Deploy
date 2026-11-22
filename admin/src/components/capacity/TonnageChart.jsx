@@ -144,7 +144,7 @@ const TonnageChart = ({ capacityData }) => {
                             dataKey="utilization"
                             name="Utilization"
                             fill="url(#utilizationGradient)"
-                            radius={[6, 6, 0, 0]}
+                            radius={[0, 0, 0, 0]}
                             maxBarSize={38}
                         >
 

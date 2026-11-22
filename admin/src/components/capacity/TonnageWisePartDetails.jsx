@@ -3,310 +3,401 @@ import React, { useMemo, useState } from "react";
 import { Search, Download } from "lucide-react";
 
 const TONNAGES = [
-  "63T",
-  "110T",
-  "160T",
-  "200T",
-  "250T",
-  "300T",
-  "315T",
-  "400T",
-  "500T",
-  "600T",
-  "800T",
+    "63T",
+    "110T",
+    "160T",
+    "200T",
+    "250T",
+    "300T",
+    "315T",
+    "400T",
+    "500T",
+    "600T",
+    "800T",
 ];
 
 const TonnageWisePartDetails = ({ parts = [] }) => {
-  const [partNoSearch, setPartNoSearch] = useState("");
-  const [partNameSearch, setPartNameSearch] = useState("");
 
-  // Get tonnage value from Map or Object
-  const getTonnageValue = (item, tonnage) => {
-    if (item.tonnage instanceof Map) {
-      return Number(item.tonnage.get(tonnage) || 0);
-    }
+    const [partNoSearch, setPartNoSearch] = useState("");
+    const [partNameSearch, setPartNameSearch] = useState("");
 
-    return Number(item.tonnage?.[tonnage] || 0);
-  };
+    // Get tonnage value from Map or Object
+    const getTonnageValue = (item, tonnage) => {
+        if (item.tonnage instanceof Map) {
+            return Number(item.tonnage.get(tonnage) || 0);
+        }
 
-  // Calculate total tonnage
-  const getTotal = (item) => {
-    return TONNAGES.reduce(
-      (total, tonnage) => total + getTonnageValue(item, tonnage),
-      0
-    );
-  };
-
-  // Filter parts by Part Number and Part Name
-  const filteredParts = useMemo(() => {
-    return parts.filter((item) => {
-      const partNoMatch = String(item.partNo || "")
-        .toLowerCase()
-        .includes(partNoSearch.trim().toLowerCase());
-
-      const partNameMatch = String(item.partName || "")
-        .toLowerCase()
-        .includes(partNameSearch.trim().toLowerCase());
-
-      return partNoMatch && partNameMatch;
-    });
-  }, [parts, partNoSearch, partNameSearch]);
-
-  // Export filtered data to CSV
-  const handleExportCSV = () => {
-    const headers = [
-      "Sr. No.",
-      "Vendor Code",
-      "Vendor Name",
-      "Plant Loc.",
-      "Part No.",
-      "Part Name",
-      "Model",
-      "Qty/veh",
-      "Per day req",
-      "No. Of Child Part",
-      ...TONNAGES,
-      "Total",
-    ];
-
-    const escapeCSV = (value) => {
-      const text = String(value ?? "");
-      return `"${text.replace(/"/g, '""')}"`;
+        return Number(item.tonnage?.[tonnage] || 0);
     };
 
-    const rows = filteredParts.map((item, index) => [
-      item.srNo ?? index + 1,
-      item.vendorCode,
-      item.vendorName,
-      item.plantLocation,
-      item.partNo,
-      item.partName,
-      Array.isArray(item.model)
-        ? item.model.join(", ")
-        : item.model,
-      item.qtyPerVehicle,
-      item.perDayRequirement,
-      item.noOfChildParts,
-      ...TONNAGES.map((tonnage) =>
-        getTonnageValue(item, tonnage)
-      ),
-      getTotal(item),
-    ]);
+    // Calculate total tonnage
+    const getTotal = (item) => {
+        return TONNAGES.reduce(
+            (total, tonnage) =>
+                total + getTonnageValue(item, tonnage),
+            0
+        );
+    };
 
-    const csvContent = [
-      headers.map(escapeCSV).join(","),
-      ...rows.map((row) =>
-        row.map(escapeCSV).join(",")
-      ),
-    ].join("\r\n");
+    // Number formatting
+    const formatNumber = (value) =>
+        Number(value || 0).toLocaleString("en-IN");
 
-    const blob = new Blob(["\uFEFF" + csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
+    // Filter parts
+    const filteredParts = useMemo(() => {
+        return parts.filter((item) => {
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+            const partNoMatch = String(item.partNo || "")
+                .toLowerCase()
+                .includes(partNoSearch.trim().toLowerCase());
 
-    link.href = url;
-    link.download = `Part_Wise_Tonnage_${new Date()
-      .toISOString()
-      .slice(0, 10)}.csv`;
+            const partNameMatch = String(item.partName || "")
+                .toLowerCase()
+                .includes(partNameSearch.trim().toLowerCase());
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+            return partNoMatch && partNameMatch;
+        });
 
-    URL.revokeObjectURL(url);
-  };
+    }, [parts, partNoSearch, partNameSearch]);
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+    // Export CSV
+    const handleExportCSV = () => {
 
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        const headers = [
+            "Sr. No.",
+            "Vendor Code",
+            "Vendor Name",
+            "Plant Loc.",
+            "Part No.",
+            "Part Name",
+            "Model",
+            "Qty/veh",
+            "Per day req",
+            "No. Of Child Part",
+            ...TONNAGES,
+            "Total",
+        ];
 
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">
-              Part Wise Tonnage Details
-            </h2>
+        const escapeCSV = (value) => {
+            const text = String(value ?? "");
+            return `"${text.replace(/"/g, '""')}"`;
+        };
 
-           
-          </div>
+        const rows = filteredParts.map((item, index) => [
+            item.srNo ?? index + 1,
+            item.vendorCode,
+            item.vendorName,
+            item.plantLocation,
+            item.partNo,
+            item.partName,
+            Array.isArray(item.model)
+                ? item.model.join(", ")
+                : item.model,
+            item.qtyPerVehicle,
+            item.perDayRequirement,
+            item.noOfChildParts,
+            ...TONNAGES.map((tonnage) =>
+                getTonnageValue(item, tonnage)
+            ),
+            getTotal(item),
+        ]);
 
-          {/* Search and Export */}
-          <div className="flex flex-col sm:flex-row gap-3">
+        const csvContent = [
+            headers.map(escapeCSV).join(","),
+            ...rows.map((row) =>
+                row.map(escapeCSV).join(",")
+            ),
+        ].join("\r\n");
 
-            {/* Part Number Search */}
-            <div className="relative">
-              <Search
-                size={17}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
+        const blob = new Blob(["\uFEFF" + csvContent], {
+            type: "text/csv;charset=utf-8;",
+        });
 
-              <input
-                type="text"
-                placeholder="Enter Part Number..."
-                value={partNoSearch}
-                onChange={(e) => setPartNoSearch(e.target.value)}
-                className="w-full sm:w-52 pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              />
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `Part_Wise_Tonnage_${new Date()
+            .toISOString()
+            .slice(0, 10)}.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    };
+
+    // Common Header Style
+    const headerClass =
+        "sticky top-0 z-30 bg-gray-100 px-3 py-3.5 text-xs font-bold text-gray-600 uppercase tracking-wide whitespace-nowrap border-b border-gray-200 shadow-sm";
+
+    return (
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+            {/* Header - Fixed */}
+            <div className="px-5 py-4 border-b border-gray-100">
+
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                    <div>
+                        <h2 className="text-base font-bold text-gray-800">
+                            Part Wise Tonnage Details
+                        </h2>
+
+                        <p className="text-xs text-gray-400 mt-1">
+                            Vendor and part-wise tonnage breakdown
+                        </p>
+                    </div>
+
+                    {/* Search and Export */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+
+                        {/* Part Number Search */}
+                        <div className="relative">
+
+                            <Search
+                                size={17}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+
+                            <input
+                                type="text"
+                                placeholder="Enter Part Number..."
+                                value={partNoSearch}
+                                onChange={(e) => setPartNoSearch(e.target.value)}
+                                className="w-full sm:w-52 pl-9 pr-3 py-2.5 border border-gray-200 bg-gray-50 rounded-lg text-sm outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                            />
+
+                        </div>
+
+                        {/* Part Name Search */}
+                        <div className="relative">
+
+                            <Search
+                                size={17}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+
+                            <input
+                                type="text"
+                                placeholder="Enter Part Name..."
+                                value={partNameSearch}
+                                onChange={(e) => setPartNameSearch(e.target.value)}
+                                className="w-full sm:w-52 pl-9 pr-3 py-2.5 border border-gray-200 bg-gray-50 rounded-lg text-sm outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                            />
+
+                        </div>
+
+                        {/* Export CSV */}
+                        <button
+                            onClick={handleExportCSV}
+                            disabled={filteredParts.length === 0}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Download size={17} />
+                            Export CSV
+                        </button>
+
+                    </div>
+                </div>
             </div>
 
-            {/* Part Name Search */}
-            <div className="relative">
-              <Search
-                size={17}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              />
+            {/* Table - Internal Scroll */}
+            <div className="max-h-[450px] overflow-auto relative">
 
-              <input
-                type="text"
-                placeholder="Enter Part Name..."
-                value={partNameSearch}
-                onChange={(e) => setPartNameSearch(e.target.value)}
-                className="w-full sm:w-52 pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-              />
+                <table className="min-w-max w-full border-separate border-spacing-0 text-sm text-left">
+
+                    {/* Sticky Header */}
+                    <thead>
+
+                        <tr>
+
+                            <th className={`${headerClass} text-left`}>
+                                Sr. No.
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Vendor Code
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Vendor Name
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Plant Loc.
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Part No.
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Part Name
+                            </th>
+
+                            <th className={`${headerClass} text-left`}>
+                                Model
+                            </th>
+
+                            <th className={`${headerClass} text-center`}>
+                                Qty/veh
+                            </th>
+
+                            <th className={`${headerClass} text-center`}>
+                                Per day req
+                            </th>
+
+                            <th className={`${headerClass} text-center`}>
+                                No. Of Child Part
+                            </th>
+
+                            {TONNAGES.map((tonnage) => (
+                                <th
+                                    key={tonnage}
+                                    className={`${headerClass} text-center`}
+                                >
+                                    {tonnage}
+                                </th>
+                            ))}
+
+                            <th className={`${headerClass} text-center`}>
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    {/* Table Body */}
+                    <tbody>
+
+                        {filteredParts.length > 0 ? (
+
+                            filteredParts.map((item, index) => (
+
+                                <tr
+                                    key={item._id || index}
+                                    className={`transition-colors duration-150 hover:bg-blue-50/70 ${
+                                        index % 2 === 0
+                                            ? "bg-white"
+                                            : "bg-gray-50/60"
+                                    }`}
+                                >
+
+                                    <td className="px-3 py-3.5 text-gray-500 whitespace-nowrap border-b border-gray-100">
+                                        {item.srNo ?? index + 1}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 font-semibold text-gray-700 whitespace-nowrap border-b border-gray-100">
+                                        {item.vendorCode || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 font-medium text-gray-800 whitespace-nowrap border-b border-gray-100">
+                                        {item.vendorName || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-gray-600 whitespace-nowrap border-b border-gray-100">
+                                        {item.plantLocation || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 font-semibold text-blue-700 whitespace-nowrap border-b border-gray-100">
+                                        {item.partNo || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-gray-700 whitespace-nowrap border-b border-gray-100">
+                                        {item.partName || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-gray-600 whitespace-nowrap border-b border-gray-100">
+                                        {Array.isArray(item.model)
+                                            ? item.model.join(", ")
+                                            : item.model || "-"}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-center text-gray-700 tabular-nums border-b border-gray-100">
+                                        {formatNumber(item.qtyPerVehicle)}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-center font-medium text-gray-700 tabular-nums border-b border-gray-100">
+                                        {formatNumber(item.perDayRequirement)}
+                                    </td>
+
+                                    <td className="px-3 py-3.5 text-center text-gray-700 tabular-nums border-b border-gray-100">
+                                        {formatNumber(item.noOfChildParts)}
+                                    </td>
+
+                                    {TONNAGES.map((tonnage) => (
+                                        <td
+                                            key={tonnage}
+                                            className="px-3 py-3.5 text-center text-gray-700 tabular-nums border-b border-gray-100"
+                                        >
+                                            {formatNumber(
+                                                getTonnageValue(item, tonnage)
+                                            )}
+                                        </td>
+                                    ))}
+
+                                    <td className="px-3 py-3.5 text-center font-bold text-gray-800 tabular-nums bg-blue-50/50 border-b border-gray-100">
+                                        {formatNumber(getTotal(item))}
+                                    </td>
+
+                                </tr>
+
+                            ))
+
+                        ) : (
+
+                            <tr>
+                                <td
+                                    colSpan={22}
+                                    className="px-4 py-12 text-center text-gray-400"
+                                >
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Search size={26} />
+                                        <span className="font-medium">
+                                            No parts found
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        )}
+
+                    </tbody>
+
+                </table>
+
             </div>
 
-            {/* Export CSV Button */}
-            <button
-              onClick={handleExportCSV}
-              disabled={filteredParts.length === 0}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Download size={16} />
-              Export CSV
-            </button>
+            {/* Footer - Fixed */}
+            <div className="px-5 py-3.5 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-2 bg-gray-50/70">
 
-          </div>
+                <p className="text-xs text-gray-500">
+                    Showing{" "}
+                    <span className="font-bold text-gray-800">
+                        {filteredParts.length}
+                    </span>
+                    {" "}of{" "}
+                    <span className="font-bold text-gray-800">
+                        {parts.length}
+                    </span>
+                    {" "}records
+                </p>
+
+                <p className="text-xs text-gray-400">
+                    Total Tonnage Categories:{" "}
+                    <span className="font-semibold text-gray-600">
+                        {TONNAGES.length}
+                    </span>
+                </p>
+
+            </div>
+
         </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-max w-full text-sm text-left">
-
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="px-3 py-3">Sr. No.</th>
-              <th className="px-3 py-3">Vendor Code</th>
-              <th className="px-3 py-3">Vendor Name</th>
-              <th className="px-3 py-3">Plant Loc.</th>
-              <th className="px-3 py-3">Part No.</th>
-              <th className="px-3 py-3">Part Name</th>
-              <th className="px-3 py-3">Model</th>
-              <th className="px-3 py-3 text-center">Qty/veh</th>
-              <th className="px-3 py-3 text-center">Per day req</th>
-              <th className="px-3 py-3 text-center">
-                No. Of Child Part
-              </th>
-
-              {TONNAGES.map((tonnage) => (
-                <th
-                  key={tonnage}
-                  className="px-3 py-3 text-center"
-                >
-                  {tonnage}
-                </th>
-              ))}
-
-              <th className="px-3 py-3 text-center">Total</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-200">
-
-            {filteredParts.length > 0 ? (
-              filteredParts.map((item, index) => (
-                <tr
-                  key={item._id || index}
-                  className="hover:bg-blue-50 transition"
-                >
-                  <td className="px-3 py-3">
-                    {item.srNo ?? index + 1}
-                  </td>
-
-                  <td className="px-3 py-3 font-medium">
-                    {item.vendorCode}
-                  </td>
-
-                  <td className="px-3 py-3">
-                    {item.vendorName}
-                  </td>
-
-                  <td className="px-3 py-3">
-                    {item.plantLocation}
-                  </td>
-
-                  <td className="px-3 py-3 font-medium text-blue-700">
-                    {item.partNo}
-                  </td>
-
-                  <td className="px-3 py-3">
-                    {item.partName}
-                  </td>
-
-                  <td className="px-3 py-3">
-                    {Array.isArray(item.model)
-                      ? item.model.join(", ")
-                      : item.model}
-                  </td>
-
-                  <td className="px-3 py-3 text-center">
-                    {item.qtyPerVehicle}
-                  </td>
-
-                  <td className="px-3 py-3 text-center">
-                    {item.perDayRequirement}
-                  </td>
-
-                  <td className="px-3 py-3 text-center">
-                    {item.noOfChildParts}
-                  </td>
-
-                  {TONNAGES.map((tonnage) => (
-                    <td
-                      key={tonnage}
-                      className="px-3 py-3 text-center"
-                    >
-                      {getTonnageValue(item, tonnage)}
-                    </td>
-                  ))}
-
-                  <td className="px-3 py-3 text-center font-semibold text-gray-800">
-                    {getTotal(item)}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={22}
-                  className="px-4 py-10 text-center text-gray-500"
-                >
-                  No parts found
-                </td>
-              </tr>
-            )}
-
-          </tbody>
-        </table>
-      </div>
-
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-200 flex justify-between items-center text-sm text-gray-500">
-        <span>
-          Showing {filteredParts.length} of {parts.length} records
-        </span>
-
-        <span>
-          Total Tonnage Categories: {TONNAGES.length}
-        </span>
-      </div>
-
-    </div>
-  );
+    );
 };
 
 export default TonnageWisePartDetails;
