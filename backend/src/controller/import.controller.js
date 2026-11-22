@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/Apierror.js";
 import { PartTonnageDetails } from "../models/presscapacity/part.tonnage.model.js";
 
+
 const importPressdataConfiguration = asyncHandler(async (req, res) => {
 
     if (!req.file) {
@@ -18,8 +19,9 @@ const importPressdataConfiguration = asyncHandler(async (req, res) => {
         trim: true,
     });
 
-    let importedCount = 0;
+    const validRecords = [];
 
+    // VALIDATE SUPPLIER AND PREPARE RECORDS
     for (const row of rows) {
 
         const supplier = await Supplier.findOne({
@@ -30,7 +32,7 @@ const importPressdataConfiguration = asyncHandler(async (req, res) => {
             continue;
         }
 
-        await PressConfiguration.create({
+        validRecords.push({
             supplierCode: supplier.supplierCode,
             supplierName: supplier.supplierName,
             location: row.location,
@@ -41,18 +43,55 @@ const importPressdataConfiguration = asyncHandler(async (req, res) => {
             hoursPerShift: Number(row["Hours Per Shift"]),
             efficiencyPercent: Number(row["Efficiency Percent"] || 85),
         });
-
-        importedCount++;
     }
+
+    if (validRecords.length === 0) {
+        throw new ApiError(400, "No valid supplier records found in CSV");
+    }
+
+    // UPDATE EXISTING DATA
+    // Existing record update hoga, new combination insert hoga.
+
+    const updateOperations = validRecords.map((record) => ({
+        updateOne: {
+            filter: {
+                supplierCode: record.supplierCode,
+                location: record.location,
+                tonnage: record.tonnage
+            },
+
+            update: {
+                $set: {
+                    supplierName: record.supplierName,
+                    numberOfPresses: record.numberOfPresses,
+                    strokesPerMinute: record.strokesPerMinute,
+                    shiftsPerDay: record.shiftsPerDay,
+                    hoursPerShift: record.hoursPerShift,
+                    efficiencyPercent: record.efficiencyPercent
+                }
+            },
+
+            upsert: true
+        }
+    }));
+
+    const result = await PressConfiguration.bulkWrite(
+        updateOperations,
+        { ordered: false }
+    );
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            { importedCount },
-            "Press configuration imported successfully"
+            {
+                insertedCount: result.upsertedCount,
+                updatedCount: result.matchedCount
+            },
+            "Press configuration CSV uploaded successfully"
         )
     );
 });
+
 
 
 const importPartWiseTonnage = asyncHandler(async (req, res) => {
@@ -108,5 +147,7 @@ const importPartWiseTonnage = asyncHandler(async (req, res) => {
         )
     );
 });
+
+
 
 export { importPressdataConfiguration, importPartWiseTonnage };
