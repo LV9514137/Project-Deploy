@@ -43,7 +43,7 @@ const Home = () => {
           </div>
 
           <a
-            href="/login"
+           href="/admin/login"
             className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700"
           >
             <UserRound size={17} />
@@ -76,7 +76,7 @@ const Home = () => {
                 </p>
 
                 <a
-                  href="/login"
+                  href="/admin/login"
                   className="inline-flex items-center gap-3 mt-6 bg-blue-600 text-white px-7 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
                   Login to Continue
