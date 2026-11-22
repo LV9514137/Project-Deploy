@@ -167,6 +167,28 @@ const CapacityComparisonChart = ({ capacityData = [] }) => {
                             }}
                         />
 
+                           {/* Available Strokes - First visual position */}
+                        <Bar
+                            dataKey="available"
+                            name="Available Strokes"
+                            fill="url(#availableGradient)"
+                            radius={[0, 0, 0, 0]}
+                            maxBarSize={30}
+                            isAnimationActive={false}
+                        >
+                            <LabelList
+                                dataKey="available"
+                                position="top"
+                                formatter={formatBarLabel}
+                                style={{
+                                    fill: "#2563EB",
+                                    fontSize: 10,
+                                    fontWeight: 600
+                                }}
+                            />
+                        </Bar>
+
+
                         {/* Required Strokes - Second visual position */}
                         <Bar
                             dataKey="required"
@@ -188,27 +210,7 @@ const CapacityComparisonChart = ({ capacityData = [] }) => {
                             />
                         </Bar>
 
-                        {/* Available Strokes - First visual position */}
-                        <Bar
-                            dataKey="available"
-                            name="Available Strokes"
-                            fill="url(#availableGradient)"
-                            radius={[0, 0, 0, 0]}
-                            maxBarSize={30}
-                            isAnimationActive={false}
-                        >
-                            <LabelList
-                                dataKey="available"
-                                position="top"
-                                formatter={formatBarLabel}
-                                style={{
-                                    fill: "#2563EB",
-                                    fontSize: 10,
-                                    fontWeight: 600
-                                }}
-                            />
-                        </Bar>
-
+                        
                     </BarChart>
 
                 </ResponsiveContainer>
