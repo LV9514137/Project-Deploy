@@ -48,10 +48,12 @@ const AdminContextProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        if (!token) {
-            navigate("/admin/login", { replace: true });
-        }
-    }, [token]);
+    const publicRoutes = ["/", "/admin/login"];
+
+    if (!token && !publicRoutes.includes(window.location.pathname)) {
+        navigate("/admin/login", { replace: true });
+    }
+}, [token, navigate]);
 
     const getAllParts = async () => {
 

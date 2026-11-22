@@ -1,106 +1,136 @@
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Factory,
   Users,
-  Boxes,
-  ChartColumn,
-  ShieldCheck,
+  Layers,
+  BarChart3,
+  ArrowRight,
+  UserRound,
 } from "lucide-react";
 
 const Home = () => {
-  const navigate = useNavigate();
+  const features = [
+    {
+      icon: Users,
+      title: "Supplier Management",
+      description: "Manage supplier and plant details",
+    },
+    {
+      icon: Layers,
+      title: "Press Capacity",
+      description: "Maintain press configuration and availability",
+    },
+    {
+      icon: BarChart3,
+      title: "Capacity Analysis",
+      description: "Track utilization and identify capacity gaps",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 h-dvh w-full overflow-hidden bg-sky-100 flex flex-col">
 
-      <div className="max-w-6xl w-full grid lg:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden">
+      {/* Navbar */}
+      <nav className="h-[65px] shrink-0 bg-sky-200 border-b border-sky-300">
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
 
-        {/* Left */}
-        <div className="bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900 text-white p-12 flex flex-col justify-center">
-
-          <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-8">
-            <Factory size={45} />
-            
+          <div className="flex items-center gap-3">
+            <Factory size={32} className="text-blue-600" />
+            <h1 className="text-xl font-bold text-gray-900">
+              Capacity <span className="text-blue-600">Tracker</span>
+            </h1>
           </div>
 
-          <h1 className="text-5xl font-bold leading-tight">
-            Capacity
-            <br />
-            Tracker
-          </h1>
-
-          <p className="mt-6 text-blue-100 text-lg leading-8">
-            Supplier Capacity Monitoring System designed to
-            monitor supplier capacity, production readiness,
-            part availability and manufacturing performance.
-          </p>
-
-          <div className="grid grid-cols-2 gap-5 mt-10">
-
-            <div className="flex items-center gap-3">
-              <Users className="text-green-300" />
-              <span>Supplier Management</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Boxes className="text-yellow-300" />
-              <span>Part Tracking</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <ChartColumn className="text-cyan-300" />
-              <span>Analytics</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="text-pink-300" />
-              <span>Secure Access</span>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Right */}
-        <div className="flex flex-col justify-center p-12">
-
-          <div className="text-center">
-
-            <Factory
-              size={70}
-              className="mx-auto text-blue-600"
-            />
-
-            <h2 className="text-3xl font-bold text-slate-800 mt-6">
-              Admin Portal
-            </h2>
-
-            <p className="text-gray-500 mt-4 leading-7">
-              Access dashboards, monitor supplier performance,
-              manage parts, generate reports and track
-              manufacturing capacity across locations.
-            </p>
-
-          </div>
-
-          <button
-            onClick={() => navigate("/admin/login")}
-            className="mt-10 w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl text-lg font-semibold transition"
+          <a
+            href="/login"
+            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700"
           >
-            Login as Admin
-          </button>
-
-          <div className="mt-10 border-t pt-6 text-center text-gray-500 text-sm">
-            Capacity Tracker v1.0
-            <br />
-            Manufacturing Operations Management System
-          </div>
-
+            <UserRound size={17} />
+            Login
+          </a>
         </div>
+      </nav>
 
-      </div>
+      {/* Main */}
+      <main className="flex-1 min-h-0 flex flex-col justify-center bg-sky-100">
 
+        {/* Hero */}
+        <section className="w-full shrink-0">
+          <div className="max-w-7xl mx-auto px-6 py-5 md:py-7">
+            <div className="grid md:grid-cols-2 items-center gap-6">
+
+              <div>
+                <p className="text-blue-600 text-xs font-bold uppercase tracking-widest mb-3">
+                  Press Capacity Management
+                </p>
+
+                <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                  Press Capacity
+                  <span className="block text-blue-600">Tracker</span>
+                </h2>
+
+                <p className="text-base text-gray-600 mt-4 leading-7 max-w-lg">
+                  A simple platform to manage supplier press capacity,
+                  track tonnage-wise utilization and identify capacity gaps.
+                </p>
+
+                <a
+                  href="/login"
+                  className="inline-flex items-center gap-3 mt-6 bg-blue-600 text-white px-7 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  Login to Continue
+                  <ArrowRight size={19} />
+                </a>
+              </div>
+
+              {/* Press Image */}
+              <div className="flex justify-center items-center">
+                <img
+                  src="/abc.png"
+                  alt="Industrial Press Machine"
+                  className="w-full max-w-[450px] h-[350px] object-contain"
+                />
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="shrink-0 bg-sky-200 border-y border-sky-300 py-5">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-3 gap-4">
+
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+
+                return (
+                  <div
+                    key={index}
+                    className="bg-sky-100 border border-sky-300 rounded-xl px-3 py-5 text-center"
+                  >
+                    <Icon
+                      size={30}
+                      className="text-blue-600 mx-auto mb-3"
+                    />
+
+                    <h3 className="text-sm md:text-base font-bold text-gray-900">
+                      {feature.title}
+                    </h3>
+
+                    <p className="text-xs md:text-sm text-gray-600 mt-2">
+                      {feature.description}
+                    </p>
+                  </div>
+                );
+              })}
+
+            </div>
+          </div>
+        </section>
+
+      </main>
     </div>
   );
 };
